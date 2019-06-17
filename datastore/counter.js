@@ -38,18 +38,25 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  console.log('Counting: ', counter);
-  // return zeroPaddedNumber(counter);
-  // return writeCounter(counter, function(err, fileData) {
-  //   if(err){
-  //     console.log("ERRRORORORR");
-  //   }else{
-  //     console.log(Number(fileData));
-  //   }
-  // });
-  return writeCounter(counter, readCounter(err, fileData));
+exports.getNextUniqueId = ( callback ) => {
+  
+  readCounter( ( err, currentCount ) => {
+
+    if ( err ) {
+      console.log('readCounter UniqueId error: ', err);
+      callback( null, 0 );
+    
+    } else {
+      writeCounter( currentCount + 1, (err, counterString) => {
+        if (err) {
+          console.log('write error');
+        } else {
+          console.log('currentCount: ', currentCount);
+          callback(counterString);
+        }
+      });
+    }
+  });
 };
 
 

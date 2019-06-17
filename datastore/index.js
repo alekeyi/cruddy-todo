@@ -8,16 +8,41 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  // var id = counter.getNextUniqueId(callback);
+  counter.getNextUniqueId( (str) => {
+    var id = str;
+    console.log('id: ' + str);
+    items[id] = text;
+
+    fs.writeFile( `./datastore/data/${id}.txt`, text, (err) => {
+      if (err) {
+        return console.log('error writing new file: ', err);
+      }
+      console.log(`File ${id}: '${text}' saved!`);
+    });
+  });
+  callback(null, { id: id, text: text });
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+
+  let data = [];
+
+  fs.readdir('./datastore/data', ( err, todos ) => {
+
+    if (err) {
+      console.log(`readAll error: ${err}`);
+    } 
+    todos.forEach( (todo) => {
+      data.push({id:todo, text: todo});
+    });
+    callback(null, data);
   });
-  callback(null, data);
+
+  // var data = _.map(items, (text, id) => {
+  //   return { id, text };
+  // });
+  // callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
