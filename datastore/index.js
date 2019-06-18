@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+var Promise = require('bluebird');
+
+var readFilePromise = Promise.promisify(fs.readFile);
 
 var items = {};
 
@@ -17,28 +20,43 @@ exports.create = (text, callback) => {
     fs.writeFile( `./datastore/data/${id}.txt`, text, (err) => {
       if (err) {
         return console.log('error writing new file: ', err);
-      }
+      }else{
+      callback(null, { id: id, text: text });
       console.log(`File ${id}: '${text}' saved!`);
+      }
     });
   });
-  callback(null, { id: id, text: text });
 };
 
 exports.readAll = (callback) => {
 
-  let data = [];
+  // let data = [];
+  const readOneAsync = Promise.promisify(exports.readOne);
 
-  fs.readdir('./datastore/data', ( err, todos ) => {
-
+  fs.readdir('./datastore/data', ( err, files ) => {
     if (err) {
       console.log(`readAll error: ${err}`);
-    } 
-    todos.forEach( (todo) => {
-      data.push({id:todo, text: todo});
-    });
-    callback(null, data);
+    } else { 
+      console.log(files)
+      // ids.forEach( (id) => {
+      var data = _.map(files, (file) => {
+        var id = path.basename(file, '.txt');
+        var filepath = path.join(exports.dataDir, file);
+        
+        console.log("id: ", id);
+        return readFilePromise(filepath).then((text) => {
+          return ({id: id, text: String(text)});
+        })/*.catch((err) => {
+          console.log("Error Read All", err);
+        });*/
+      });
+      Promise.all(data).then((todoObjects) => {
+        callback(null, todoObjects);
+      });
+    }
   });
 
+  
   // var data = _.map(items, (text, id) => {
   //   return { id, text };
   // });
@@ -47,7 +65,7 @@ exports.readAll = (callback) => {
 
 exports.readOne = (id, callback) => {
 
-  fs.readFile(`./datastore/data/${id}`, (err, todo) => {
+  fs.readFile(`./datastore/data/${id}.txt`, (err, todo) => {
     if (err) {
       console.log('error at readOne: ', err);
     }
@@ -66,7 +84,7 @@ exports.readOne = (id, callback) => {
 
 exports.update = (id, text, callback) => {
   
-  fs.writeFile(`./datastore/data/${id}`, text, (err) => {
+  fs.writeFile(`./datastore/data/${id}.txt`, text, (err) => {
 
     if (err) {
       console.log('Error updating: ', err);
@@ -79,7 +97,7 @@ exports.update = (id, text, callback) => {
 
 exports.delete = (id, callback) => {
 
-  fs.unlink(`./datastore/data/${id}`, (err) => {
+  fs.unlink(`./datastore/data/${id}.txt`, (err) => {
     if (err) {
       console.log('deletion error: ', err);
     }
