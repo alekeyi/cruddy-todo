@@ -46,33 +46,54 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+
+  fs.readFile(`./datastore/data/${id}`, (err, todo) => {
+    if (err) {
+      console.log('error at readOne: ', err);
+    }
+    console.log('todo readOne ', String(todo));
+    callback(null, {text: String(todo)});
+  });
 };
 
+//   var text = items[id];
+//   if (!text) {
+//     callback(new Error(`No item with id: ${id}`));
+//   } else {
+//     callback(null, { id, text });
+//   }
+// };
+
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  
+  fs.writeFile(`./datastore/data/${id}`, text, (err) => {
+
+    if (err) {
+      console.log('Error updating: ', err);
+    }
+    console.log('Updated text: ', text);
+    callback(null, {id, text});
+  });
+
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+
+  fs.unlink(`./datastore/data/${id}`, (err) => {
+    if (err) {
+      console.log('deletion error: ', err);
+    }
+    callback(null);
+  });
+
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
