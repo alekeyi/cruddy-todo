@@ -14,7 +14,7 @@ exports.create = (text, callback) => {
   // var id = counter.getNextUniqueId(callback);
   counter.getNextUniqueId( (str) => {
     var id = str;
-    console.log('id: ' + str);
+    // console.log('id: ' + str);
     items[id] = text;
 
     fs.writeFile( `./datastore/data/${id}.txt`, text, (err) => {
@@ -37,13 +37,13 @@ exports.readAll = (callback) => {
     if (err) {
       console.log(`readAll error: ${err}`);
     } else { 
-      console.log(files);
+      // console.log(files);
       // ids.forEach( (id) => {
       var data = _.map(files, (file) => {
         var id = path.basename(file, '.txt');
         var filepath = path.join(exports.dataDir, file);
         
-        console.log("id: ", id);
+        // console.log("id: ", id);
         return readFilePromise(filepath).then((text) => {
           return ({id: id, text: String(text)});
         });/*.catch((err) => {
@@ -69,7 +69,7 @@ exports.readOne = (id, callback) => {
     if (err) {
       console.log('error at readOne: ', err);
     }
-    console.log('todo readOne ', String(todo));
+    // console.log('todo readOne ', String(todo));
     callback(null, {text: String(todo)});
   });
 };
