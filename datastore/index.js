@@ -21,8 +21,8 @@ exports.create = (text, callback) => {
       if (err) {
         return console.log('error writing new file: ', err);
       }else{
-      callback(null, { id: id, text: text });
-      console.log(`File ${id}: '${text}' saved!`);
+        callback(null, { id: id, text: text });
+        console.log(`File ${id}: '${text}' saved!`);
       }
     });
   });
@@ -37,7 +37,7 @@ exports.readAll = (callback) => {
     if (err) {
       console.log(`readAll error: ${err}`);
     } else { 
-      console.log(files)
+      console.log(files);
       // ids.forEach( (id) => {
       var data = _.map(files, (file) => {
         var id = path.basename(file, '.txt');
@@ -46,7 +46,7 @@ exports.readAll = (callback) => {
         console.log("id: ", id);
         return readFilePromise(filepath).then((text) => {
           return ({id: id, text: String(text)});
-        })/*.catch((err) => {
+        });/*.catch((err) => {
           console.log("Error Read All", err);
         });*/
       });
